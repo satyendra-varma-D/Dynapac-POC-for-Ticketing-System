@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router';
-import { 
-  AlertTriangle, Clock, Package, CheckCircle, Ticket, TrendingUp, MessageCircle, 
-  MessageSquare, X, HelpCircle, Send, Paperclip, Plus, User, Sparkles, 
+import {
+  AlertTriangle, Clock, Package, CheckCircle, Ticket, TrendingUp, MessageCircle,
+  MessageSquare, X, HelpCircle, Send, Paperclip, Plus, User, Sparkles,
   ChevronRight, BarChart3, Users, Filter, Calendar, Activity
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
@@ -195,23 +195,23 @@ export default function Dashboard() {
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
         <div>
           <div className="flex items-center gap-2 mb-2">
-             <div className="px-2 py-0.5 bg-red-50 text-[#C8102E] text-[10px] font-bold uppercase tracking-wider rounded border border-red-100">Support Agent</div>
-             <div className="text-xs text-gray-400">Mike Chen • Germany Center</div>
+            <div className="px-2 py-0.5 bg-red-50 text-[#C8102E] text-[10px] font-bold uppercase tracking-wider rounded border border-red-100">Support Agent</div>
+            <div className="text-xs text-gray-400">Mike Chen • Germany Center</div>
           </div>
           <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
             Service Dashboard
           </h1>
         </div>
         <div className="flex items-center gap-3">
-           <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-xs text-gray-600 hover:bg-gray-50 transition-all shadow-sm">
-             <Calendar className="w-3.5 h-3.5" /> Export Data
-           </button>
-           <button 
-             onClick={() => navigate('/customer/create-ticket')}
-             className="flex items-center gap-2 px-6 py-2.5 bg-[#C8102E] rounded-xl font-bold text-xs text-white hover:bg-[#B00E29] transition-all shadow-lg shadow-red-900/10"
-           >
-             <Plus className="w-4 h-4" /> New Ticket
-           </button>
+          <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-xs text-gray-600 hover:bg-gray-50 transition-all shadow-sm">
+            <Calendar className="w-3.5 h-3.5" /> Export Data
+          </button>
+          <button
+            onClick={() => navigate('/customer/create-ticket')}
+            className="flex items-center gap-2 px-6 py-2.5 bg-[#C8102E] rounded-xl font-bold text-xs text-white hover:bg-[#B00E29] transition-all shadow-lg shadow-red-900/10"
+          >
+            <Plus className="w-4 h-4" /> New Ticket
+          </button>
         </div>
       </div>
 
@@ -278,7 +278,7 @@ export default function Dashboard() {
               </div>
             </div>
           </div>
-          
+
           <div className="h-[280px] w-full">
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={trendingData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }} barGap={8}>
@@ -299,7 +299,7 @@ export default function Dashboard() {
               <div className="p-2 bg-gray-50 rounded-lg"><Sparkles className="w-4 h-4 text-[#C8102E]" /></div>
               Source Distribution
             </h2>
-            
+
             <div className="space-y-8 flex-1">
               {[
                 { label: 'AI Extraction', count: 42, color: 'text-indigo-600', bg: 'bg-indigo-50' },
@@ -317,7 +317,7 @@ export default function Dashboard() {
                 </div>
               ))}
             </div>
-            
+
             <button className="mt-10 w-full py-3 bg-gray-50 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
               View Insights <ChevronRight className="w-4 h-4" />
             </button>
@@ -327,23 +327,23 @@ export default function Dashboard() {
 
       {/* Unified Status Navigator */}
       <div className="bg-white rounded-[16px] p-2 border border-gray-200 shadow-sm flex items-center gap-1 overflow-x-auto no-scrollbar">
-         {[
-           { label: 'New', count: 4, icon: Plus, iconColor: 'text-blue-600', bgColor: 'bg-blue-50' },
-           { label: 'Assigned', count: 12, icon: User, iconColor: 'text-amber-600', bgColor: 'bg-amber-50' },
-           { label: 'Waiting', count: 3, icon: Clock, iconColor: 'text-purple-600', bgColor: 'bg-purple-50' },
-           { label: 'Resolved', count: 45, icon: CheckCircle, iconColor: 'text-emerald-600', bgColor: 'bg-emerald-50' },
-           { label: 'Closed', count: 156, icon: X, iconColor: 'text-gray-600', bgColor: 'bg-gray-100' }
-         ].map((status, i) => (
-           <div key={i} className="flex-1 min-w-[140px] px-6 py-4 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-4 group cursor-pointer border border-transparent">
-             <div className={`w-10 h-10 ${status.bgColor} rounded-lg flex items-center justify-center ${status.iconColor} transition-transform`}>
-               <status.icon className="w-5 h-5" />
-             </div>
-             <div>
-               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{status.label}</p>
-               <p className="text-lg font-bold text-gray-900 leading-none">{status.count}</p>
-             </div>
-           </div>
-         ))}
+        {[
+          { label: 'New', count: 4, icon: Plus, iconColor: 'text-blue-600', bgColor: 'bg-blue-50' },
+          { label: 'Assigned', count: 12, icon: User, iconColor: 'text-amber-600', bgColor: 'bg-amber-50' },
+          { label: 'Waiting', count: 3, icon: Clock, iconColor: 'text-purple-600', bgColor: 'bg-purple-50' },
+          { label: 'Resolved', count: 45, icon: CheckCircle, iconColor: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+          { label: 'Closed', count: 156, icon: X, iconColor: 'text-gray-600', bgColor: 'bg-gray-100' }
+        ].map((status, i) => (
+          <div key={i} className="flex-1 min-w-[140px] px-6 py-4 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-4 group cursor-pointer border border-transparent">
+            <div className={`w-10 h-10 ${status.bgColor} rounded-lg flex items-center justify-center ${status.iconColor} transition-transform`}>
+              <status.icon className="w-5 h-5" />
+            </div>
+            <div>
+              <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{status.label}</p>
+              <p className="text-lg font-bold text-gray-900 leading-none">{status.count}</p>
+            </div>
+          </div>
+        ))}
       </div>
       <div className="bg-white rounded-[24px] shadow-sm border border-gray-200 overflow-hidden">
         <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
@@ -352,11 +352,11 @@ export default function Dashboard() {
             <span className="px-2.5 py-0.5 bg-red-50 text-[#C8102E] text-[10px] font-bold rounded uppercase tracking-wider">Active Focus</span>
           </h2>
           <div className="flex items-center gap-3">
-             <div className="relative">
-                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
-                <input type="text" placeholder="Search..." className="pl-9 pr-4 py-1.5 bg-gray-50 border border-transparent rounded-lg text-xs font-medium focus:bg-white focus:border-gray-200 focus:outline-none transition-all w-36" />
-             </div>
-             <button className="p-2 text-gray-400 hover:text-[#C8102E] bg-gray-50 rounded-lg transition-colors"><BarChart3 className="w-4 h-4" /></button>
+            <div className="relative">
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+              <input type="text" placeholder="Search..." className="pl-9 pr-4 py-1.5 bg-gray-50 border border-transparent rounded-lg text-xs font-medium focus:bg-white focus:border-gray-200 focus:outline-none transition-all w-36" />
+            </div>
+            <button className="p-2 text-gray-400 hover:text-[#C8102E] bg-gray-50 rounded-lg transition-colors"><BarChart3 className="w-4 h-4" /></button>
           </div>
         </div>
 
@@ -380,7 +380,7 @@ export default function Dashboard() {
                   <td className="px-8 py-5">
                     {ticket.priority === 'high' ? (
                       <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-red-50 text-[#C8102E] text-[10px] font-bold uppercase rounded">
-                         <div className="w-1 h-1 bg-[#C8102E] rounded-full animate-pulse"></div> High
+                        <div className="w-1 h-1 bg-[#C8102E] rounded-full animate-pulse"></div> High
                       </div>
                     ) : (
                       <div className="text-[10px] font-bold text-gray-400 uppercase">Medium</div>
@@ -460,8 +460,8 @@ export default function Dashboard() {
                   </div>
                   <div
                     className={`px-4 py-2.5 rounded-lg ${msg.sender === 'agent'
-                        ? 'bg-[#C8102E] text-white'
-                        : 'bg-white text-gray-900 border border-gray-200'
+                      ? 'bg-[#C8102E] text-white'
+                      : 'bg-white text-gray-900 border border-gray-200'
                       }`}
                   >
                     <p className="text-sm">{msg.message}</p>

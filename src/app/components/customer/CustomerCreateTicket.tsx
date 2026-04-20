@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { Upload, X, CheckCircle, AlertCircle, Package, Truck, Sparkles, Info, Calendar, AlertTriangle, FileText, Paperclip, Loader2, ChevronRight, Edit2, Send, MessageCircle, Mic, MicOff } from 'lucide-react';
+import { Upload, X, CheckCircle, AlertCircle, Package, Truck, Sparkles, Info, Calendar, AlertTriangle, FileText, Paperclip, Loader2, ChevronRight, Edit2, Send, MessageCircle, Mic, MicOff, Clock } from 'lucide-react';
 import { useNavigate } from 'react-router';
 
 const availableOrders = [
