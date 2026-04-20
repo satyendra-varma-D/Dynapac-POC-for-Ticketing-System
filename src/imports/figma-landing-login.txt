@@ -1,0 +1,70 @@
+INSERT INTO figma_make_prompts (screen_name, prompt_text) VALUES
+(
+'Landing_Login_Page',
+'Design a premium SaaS landing + login screen for an enterprise Aftermarket Service Support System.
+
+Objective:
+This is the first screen users see before accessing the system. It must look secure, professional, and enterprise-ready.
+
+Style Guidelines:
+- 1440px desktop layout
+- 12-column grid
+- White primary background
+- Very light grey section backgrounds (#F5F6F8)
+- Subtle red accent color (#C8102E) for primary actions only
+- Rounded corners (12px)
+- Soft, minimal shadows
+- Clean modern SaaS typography
+- No clutter, no heavy graphics
+
+Layout Structure:
+
+TOP HEADER (minimal):
+- Logo on left
+- System name: "Aftermarket Service Platform"
+- On right: small text link "Support" and language selector
+
+MAIN SECTION (Split Layout):
+
+LEFT SIDE (60% width):
+- Clean, professional hero area
+- Headline: "Service Operations Simplified"
+- Subtext: "Manage spare parts inquiries, track orders, and resolve support cases efficiently from one centralized platform."
+- 3 minimal feature highlights with small line icons:
+  1. Centralized Ticket Management
+  2. Real-Time Order Visibility
+  3. SLA & Performance Monitoring
+
+Keep this section minimal and structured, not marketing-heavy.
+
+RIGHT SIDE (40% width):
+Centered login card with:
+- Title: "Sign In"
+- Email input field
+- Password input field
+- Remember me checkbox
+- Primary red button: "Login"
+- Secondary subtle link: "Forgot Password?"
+- Small footer text: "Secure access for authorized personnel only."
+
+LOGIN CARD DESIGN:
+- Light grey background
+- Rounded 12px
+- Soft shadow
+- Clean spacing (24px padding)
+
+FOOTER (minimal):
+- Small grey text
+- Copyright
+- Privacy Policy link
+- Version number (v1.0.0)
+
+Overall Feel:
+Modern enterprise SaaS.
+Calm.
+Trustworthy.
+Operational.
+Not flashy.
+Not marketing-style.
+Designed for B2B industrial environment.'
+);

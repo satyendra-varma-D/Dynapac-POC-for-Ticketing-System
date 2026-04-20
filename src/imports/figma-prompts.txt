@@ -1,0 +1,124 @@
+-- ==================================================
+-- SUPPORT SYSTEM EXPANSION MODULES – FIGMA PROMPTS
+-- ==================================================
+
+INSERT INTO figma_make_prompts (screen_name, prompt_text) VALUES
+
+(
+'Workspace_Selection_Screen',
+'Design a Workspace Selection screen for a SaaS Support System.
+
+Style:
+- Clean white background
+- Centered card layout
+- Subtle red accent (#C8102E)
+- 1440px desktop
+
+Include:
+- Title: "Select Workspace"
+- Role selection (Support Agent / Supervisor)
+- Region selection (Germany / EU / Global)
+- Queue selection (Spare Parts / Technical / Warranty)
+- Primary red "Enter Workspace" button
+
+Minimal and structured.'
+),
+
+(
+'Queue_Management_Screen',
+'Create a Queue Management screen for Support Agents.
+
+Include:
+- Tabs: Unassigned | My Tickets | Team Queue
+- Bulk select checkboxes
+- Assign / Reassign modal
+- Filter by Region, Priority, SLA Risk
+- Clean SaaS table layout
+
+Red highlights for SLA risk rows.'
+),
+
+(
+'SLA_Escalation_Center',
+'Design an SLA & Escalation Center screen.
+
+Include:
+- SLA Risk Tickets table
+- Escalation status column
+- Escalation history timeline
+- Escalate modal with reason dropdown
+- Supervisor override action button
+
+Professional enterprise style.'
+),
+
+(
+'Error_States_Screens',
+'Create error state UI variations for the Ticket Detail screen.
+
+Include:
+- SAP fetch failure card
+- Shipment API failure card
+- Order not found message
+- Multiple order match selector modal
+- Retry buttons
+
+Use subtle red background for error alerts.'
+),
+
+(
+'Activity_Audit_Log_Component',
+'Design an Activity Timeline component for Ticket Detail.
+
+Vertical timeline layout including:
+- Ticket created
+- Assigned
+- Order fetched
+- Status changed
+- Response sent
+- Escalated
+- Closed
+
+Use neutral colors with subtle icons.'
+),
+
+(
+'Internal_Collaboration_Panel',
+'Create an Internal Collaboration panel for Support Agents.
+
+Include:
+- Internal notes section
+- @mention tagging
+- File upload
+- Internal-only toggle
+
+Clean chat-style layout separate from customer messages.'
+),
+
+(
+'Supervisor_Dashboard',
+'Design a Supervisor Dashboard.
+
+Include:
+- Ticket volume trend chart
+- SLA breach heatmap
+- Agent workload cards
+- Reassign ticket quick action
+- Escalation summary
+
+Executive SaaS layout with clean spacing.'
+),
+
+(
+'User_Role_Management_Screen',
+'Design an Admin User Management screen.
+
+Include:
+- User list table
+- Role assignment dropdown
+- Region assignment dropdown
+- Activate / Deactivate toggle
+- Permission matrix preview
+
+Clean enterprise SaaS style.'
+);

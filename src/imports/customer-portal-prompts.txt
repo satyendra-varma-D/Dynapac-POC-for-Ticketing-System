@@ -1,0 +1,212 @@
+-- ==================================================
+-- CUSTOMER PORTAL – COMPLETE MODULE SET
+-- ==================================================
+
+INSERT INTO figma_make_prompts (screen_name, prompt_text) VALUES
+
+(
+'Customer_Login_Screen',
+'Create a clean SaaS login screen for a Customer Portal of an Aftermarket Service Platform.
+
+Style:
+- White background
+- Soft grey login card
+- Red accent (#C8102E)
+- 1440px desktop
+
+Include:
+- Logo
+- Title: "Customer Service Portal"
+- Email input
+- Password input
+- Primary red Login button
+- Forgot password link
+- Language selector top right
+- Optional link: "Track Order Without Login"
+
+Minimal and professional.'
+),
+
+(
+'Customer_Dashboard',
+'Design a Customer Dashboard for a SaaS Aftermarket Support Platform.
+
+Include:
+
+Header:
+- Logo
+- Search bar (Order Number / Ticket ID)
+- Notifications icon
+- Profile dropdown
+
+KPI Cards:
+- Open Tickets
+- Orders In Transit
+- Delayed Orders
+- Recently Resolved
+
+Main Section:
+Recent Tickets table:
+- Ticket ID
+- Order Number
+- Issue Type
+- Status chip
+- Last Updated
+- View button
+
+Secondary Section:
+Quick Actions:
+- Create New Ticket
+- Check Order Status
+- Download Documents
+
+Clean SaaS style with subtle red accents.'
+),
+
+(
+'Customer_Create_Ticket_Screen',
+'Create a Smart Ticket Creation screen for customers.
+
+Two-column layout.
+
+LEFT:
+- Issue type dropdown
+- Order number input (auto-fetch preview)
+- Part number input
+- Description field
+- File upload
+
+RIGHT:
+Live Order Preview Card (auto-populated after order entry):
+- Order status
+- Delivery status
+- ETA
+- Tracking number (if available)
+- Warehouse stock status
+
+Primary red "Submit Ticket" button.
+
+Design should encourage self-resolution before submission.'
+),
+
+(
+'Customer_Order_Self_Check',
+'Design an Order Self-Check screen for customers.
+
+Include:
+- Order number input field
+- Fetch button
+- Order summary card:
+  - Order status
+  - Delivery status
+  - Supplier ETA
+  - Shipment tracking
+  - Delay explanation if applicable
+
+Include informational banner:
+"If your issue is resolved, no need to create a ticket."
+
+Clean, transparent layout.'
+),
+
+(
+'Customer_Ticket_Detail_View',
+'Create a Customer Ticket Detail screen.
+
+Layout:
+LEFT:
+- Chat-style conversation with support agent
+- Attachment preview
+- Timestamp display
+
+RIGHT:
+Order information summary card
+Shipment tracking card
+Status chip
+Estimated resolution time (if available)
+
+Include "Add Message" input at bottom.
+
+Modern SaaS support interface.'
+),
+
+(
+'Customer_Notifications_Center',
+'Design a Notifications Center for customers.
+
+Include:
+- SLA updates
+- Order delay alerts
+- Shipment delivered confirmation
+- Ticket response alerts
+
+Structured dropdown panel style or full-page list view.
+
+Unread indicators and filter options.'
+),
+
+(
+'Customer_My_Orders_View',
+'Create a My Orders screen for customers.
+
+Table layout:
+- Order number
+- Order date
+- Status
+- ETA
+- Shipment status
+- View details button
+
+Include filters:
+- Date range
+- Status
+- Part number
+
+Clean enterprise SaaS layout.'
+),
+
+(
+'Customer_Documents_Center',
+'Design a Documents Center for customers.
+
+Include:
+- Invoices
+- Delivery notes
+- Order confirmations
+- Download button
+- Search and filter options
+
+Card or table layout.
+
+Minimal design.'
+),
+
+(
+'Customer_Profile_Settings',
+'Create a Customer Profile & Settings screen.
+
+Include:
+- Company name
+- Contact person
+- Email
+- Phone
+- Notification preferences
+- Change password
+- Language selection
+
+Simple, structured layout.'
+),
+
+(
+'Customer_Closed_Ticket_View',
+'Design a Closed Ticket screen.
+
+Include:
+- Status: Closed (green chip)
+- Conversation history
+- Closure summary
+- Option to Reopen Ticket
+- Feedback rating (optional)
+
+Clean and professional.'
+);
