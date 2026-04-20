@@ -13,6 +13,8 @@ interface Ticket {
   category: string;
   status: 'open' | 'in-progress' | 'resolved' | 'closed';
   createdDate: string;
+  createdBy: string;
+  slaTime: string;
   lastUpdated: string;
 }
 
@@ -29,6 +31,8 @@ const myAssignedTickets: Ticket[] = [
     category: 'Delivery',
     status: 'open',
     createdDate: '2024-03-08',
+    createdBy: 'AI System',
+    slaTime: '2h 15m',
     lastUpdated: '2 hours ago',
   },
   {
@@ -42,6 +46,8 @@ const myAssignedTickets: Ticket[] = [
     category: 'Logistics',
     status: 'in-progress',
     createdDate: '2024-03-07',
+    createdBy: 'Mike Chen',
+    slaTime: '5h 30m',
     lastUpdated: '1 day ago',
   },
   {
@@ -55,6 +61,8 @@ const myAssignedTickets: Ticket[] = [
     category: 'Quality',
     status: 'resolved',
     createdDate: '2024-03-06',
+    createdBy: 'Customer Portal',
+    slaTime: 'Met',
     lastUpdated: '2 days ago',
   },
   {
@@ -68,6 +76,8 @@ const myAssignedTickets: Ticket[] = [
     category: 'Quality',
     status: 'closed',
     createdDate: '2024-03-05',
+    createdBy: 'AI System',
+    slaTime: 'Met',
     lastUpdated: '3 days ago',
   },
   {
@@ -81,6 +91,8 @@ const myAssignedTickets: Ticket[] = [
     category: 'Delivery',
     status: 'in-progress',
     createdDate: '2024-03-04',
+    createdBy: 'Customer Portal',
+    slaTime: '8h 10m',
     lastUpdated: '4 days ago',
   },
 ];
@@ -281,7 +293,16 @@ export default function MyTickets() {
                     Priority
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    By Whom
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    Created Date
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Order Number
+                  </th>
+                  <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
+                    SLA Time
                   </th>
                   <th className="px-6 py-3 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">
                     Last Updated
@@ -331,7 +352,18 @@ export default function MyTickets() {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-900 font-medium">{ticket.createdBy}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className="text-sm text-gray-600">{ticket.createdDate}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-900">{ticket.orderNumber}</div>
+                    </td>
+                    <td className="px-6 py-4 whitespace-nowrap">
+                      <div className={`text-sm font-bold ${ticket.slaTime === 'Met' ? 'text-emerald-600' : 'text-[#C8102E]'}`}>
+                        {ticket.slaTime}
+                      </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="text-sm text-gray-600">{ticket.lastUpdated}</div>

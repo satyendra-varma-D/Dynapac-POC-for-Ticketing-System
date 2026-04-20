@@ -21,6 +21,8 @@ export default function CustomerTickets() {
       category: 'Delivery',
       createdDate: '2024-03-08',
       company: 'Acme Corp',
+      source: 'Customer',
+      createdBy: 'Customer - John Doe',
     },
     {
       id: 'TKT-10198',
@@ -34,6 +36,8 @@ export default function CustomerTickets() {
       category: 'Logistics',
       createdDate: '2024-03-07',
       company: 'Acme Corp',
+      source: 'Email',
+      createdBy: 'Admin - Thomas',
     },
     {
       id: 'TKT-10145',
@@ -47,6 +51,8 @@ export default function CustomerTickets() {
       category: 'Quality',
       createdDate: '2024-03-05',
       company: 'Acme Corp',
+      source: 'AI',
+      createdBy: 'Agent - Cyril',
     },
     {
       id: 'TKT-10098',
@@ -60,6 +66,8 @@ export default function CustomerTickets() {
       category: 'Quality',
       createdDate: '2024-03-01',
       company: 'Acme Corp',
+      source: 'Customer',
+      createdBy: 'Customer - John Doe',
     },
     {
       id: 'TKT-10045',
@@ -73,6 +81,8 @@ export default function CustomerTickets() {
       category: 'Technical',
       createdDate: '2024-02-25',
       company: 'Acme Corp',
+      source: 'Customer',
+      createdBy: 'Customer - John Doe',
     },
     {
       id: 'TKT-10012',
@@ -86,6 +96,8 @@ export default function CustomerTickets() {
       category: 'Returns',
       createdDate: '2024-02-18',
       company: 'Acme Corp',
+      source: 'Email',
+      createdBy: 'Admin - Thomas',
     },
   ];
 
@@ -114,6 +126,19 @@ export default function CustomerTickets() {
         return { color: 'bg-green-100 text-green-700', label: 'Low Risk' };
       default:
         return { color: 'bg-gray-100 text-gray-700', label: priority };
+    }
+  };
+
+  const getSourceConfig = (source: string) => {
+    switch (source) {
+      case 'Customer':
+        return { color: 'text-blue-600', bg: 'bg-blue-50' };
+      case 'Email':
+        return { color: 'text-purple-600', bg: 'bg-purple-50' };
+      case 'AI':
+        return { color: 'text-indigo-600', bg: 'bg-indigo-50' };
+      default:
+        return { color: 'text-gray-600', bg: 'bg-gray-50' };
     }
   };
 
@@ -333,92 +358,87 @@ export default function CustomerTickets() {
               )}
             </div>
           ) : (
-            /* List View */
-            <div className="space-y-3">
-              {filteredTickets.length === 0 ? (
-                <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-                  <p className="text-gray-500">No tickets found matching your criteria</p>
-                </div>
-              ) : (
-                filteredTickets.map((ticket) => {
-                  const statusConfig = getStatusConfig(ticket.status);
-                  const priorityConfig = getPriorityConfig(ticket.priority);
+            /* Tabular List View */
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left border-collapse">
+                  <thead>
+                    <tr className="bg-gray-50 border-b border-gray-200">
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Ticket ID</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Issue Type</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Status</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Priority</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Source</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Created By</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Assigned</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider whitespace-nowrap">Last Updated</th>
+                      <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider text-right uppercase">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-gray-200">
+                    {filteredTickets.map((ticket) => {
+                      const statusConfig = getStatusConfig(ticket.status);
+                      const priorityConfig = getPriorityConfig(ticket.priority);
+                      const sourceConfig = getSourceConfig(ticket.source);
+                      const initials = ticket.assignedTo.split(' ').map(n => n[0]).join('').toUpperCase();
 
-                  // Get initials for avatar
-                  const initials = ticket.assignedTo
-                    .split(' ')
-                    .map((n) => n[0])
-                    .join('')
-                    .toUpperCase();
-
-                  return (
-                    <div
-                      key={ticket.id}
-                      className="bg-white rounded-xl border border-gray-200 hover:shadow-md transition-all cursor-pointer group"
-                      onClick={() => navigate(`/customer/tickets/${ticket.id}`)}
-                    >
-                      <div className="flex items-center gap-6 p-5">
-                        {/* Ticket ID */}
-                        <div className="w-28 flex-shrink-0">
-                          <span className="text-sm font-semibold text-[#C8102E] font-mono">
-                            {ticket.id}
-                          </span>
-                        </div>
-
-                        {/* Issue Type & Description */}
-                        <div className="flex-1 min-w-0">
-                          <h3 className="font-semibold text-gray-900 text-sm mb-1 truncate">
-                            {ticket.issueType}
-                          </h3>
-                          <p className="text-xs text-gray-500 truncate">{ticket.description}</p>
-                        </div>
-
-                        {/* Status Badge */}
-                        <div className="flex-shrink-0">
-                          <span
-                            className={`inline-flex px-3 py-1.5 rounded-lg text-xs font-medium ${statusConfig.color}`}
-                          >
-                            {statusConfig.label}
-                          </span>
-                        </div>
-
-                        {/* Priority Badge */}
-                        <div className="flex-shrink-0">
-                          <span
-                            className={`inline-flex px-3 py-1.5 rounded-lg text-xs font-medium ${priorityConfig.color}`}
-                          >
-                            {priorityConfig.label}
-                          </span>
-                        </div>
-
-                        {/* Assigned Person with Avatar */}
-                        <div className="flex items-center gap-2 w-40 flex-shrink-0">
-                          <div className="w-8 h-8 bg-gradient-to-br from-[#C8102E] to-[#A00D25] rounded-full flex items-center justify-center flex-shrink-0">
-                            <span className="text-white font-semibold text-xs">{initials}</span>
-                          </div>
-                          <span className="text-sm text-gray-700 truncate">{ticket.assignedTo}</span>
-                        </div>
-
-                        {/* Time */}
-                        <div className="flex items-center gap-1.5 w-28 flex-shrink-0">
-                          <Clock className="w-3.5 h-3.5 text-gray-400" />
-                          <span className="text-xs text-gray-500">{ticket.lastUpdated}</span>
-                        </div>
-
-                        {/* Actions */}
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                          }}
-                          className="p-2 hover:bg-gray-100 rounded-lg transition-colors opacity-0 group-hover:opacity-100 flex-shrink-0"
+                      return (
+                        <tr
+                          key={ticket.id}
+                          className="hover:bg-gray-50 transition-colors group cursor-pointer"
+                          onClick={() => navigate(`/customer/tickets/${ticket.id}`)}
                         >
-                          <MoreVertical className="w-5 h-5 text-gray-400" />
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })
-              )}
+                          <td className="px-6 py-4">
+                            <span className="text-sm font-bold text-[#C8102E] font-mono">{ticket.id}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="min-w-[200px]">
+                              <p className="text-sm font-semibold text-gray-900 mb-0.5">{ticket.issueType}</p>
+                              <p className="text-xs text-gray-500 truncate max-w-[240px]">{ticket.description}</p>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-tight ${statusConfig.color}`}>
+                              {statusConfig.label}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className={`inline-flex px-2.5 py-1 rounded-lg text-[11px] font-bold uppercase tracking-tight ${priorityConfig.color}`}>
+                              {priorityConfig.label}
+                            </span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-1.5">
+                              <div className={`w-2 h-2 rounded-full ${sourceConfig.color.replace('text', 'bg')}`}></div>
+                              <span className={`text-xs font-medium ${sourceConfig.color}`}>{ticket.source}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <span className="text-xs text-gray-700 font-medium whitespace-nowrap">{ticket.createdBy}</span>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-2">
+                              <div className="w-7 h-7 bg-gray-100 rounded-full flex items-center justify-center text-[10px] font-bold text-gray-600 border border-gray-200">
+                                {initials}
+                              </div>
+                              <span className="text-xs text-gray-600 font-medium whitespace-nowrap">{ticket.assignedTo}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4">
+                            <div className="flex items-center gap-1.5 text-gray-500">
+                              <Clock className="w-3.5 h-3.5" />
+                              <span className="text-xs whitespace-nowrap">{ticket.lastUpdated}</span>
+                            </div>
+                          </td>
+                          <td className="px-6 py-4 text-right">
+                             <button className="text-sm font-bold text-[#C8102E] hover:underline whitespace-nowrap">View Detail</button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
             </div>
           )}
         </div>

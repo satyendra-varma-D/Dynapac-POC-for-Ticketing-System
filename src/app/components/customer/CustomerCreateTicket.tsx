@@ -1,6 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { Upload, X, CheckCircle, AlertCircle, Package, Truck, Sparkles, Info, Calendar, AlertTriangle, FileText, Paperclip, Loader2, ChevronRight, Edit2, Send, MessageCircle } from 'lucide-react';
+import { Upload, X, CheckCircle, AlertCircle, Package, Truck, Sparkles, Info, Calendar, AlertTriangle, FileText, Paperclip, Loader2, ChevronRight, Edit2, Send, MessageCircle, Mic, MicOff } from 'lucide-react';
 import { useNavigate } from 'react-router';
+
+const availableOrders = [
+  'ORD-45678901',
+  'ORD-98765432',
+  'ORD-12345678',
+  'ORD-55443322',
+  'ORD-11223344',
+  'ORD-88776655',
+];
 
 export default function CustomerCreateTicket() {
   const navigate = useNavigate();
@@ -34,12 +43,75 @@ export default function CustomerCreateTicket() {
     avatar: string;
   } | null>(null);
 
+  // Speech Recognition State
+  const [isListening, setIsListening] = useState(false);
+  const [recognition, setRecognition] = useState<any>(null);
+
+  useEffect(() => {
+    if (typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)) {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      const recog = new SpeechRecognition();
+      recog.continuous = true;
+      recog.interimResults = true;
+      recog.lang = 'en-US';
+
+      recog.onresult = (event: any) => {
+        let interimTranscript = '';
+        console.log("event.results:", event.results);
+        for (let i = event.resultIndex; i < event.results.length; ++i) {
+          if (event.results[i].isFinal) {
+            setDescription(prev => prev + ' ' + event.results[i][0].transcript);
+          } else {
+            interimTranscript += event.results[i][0].transcript;
+          }
+        }
+      };
+
+      recog.onend = () => {
+        setIsListening(false);
+      };
+
+      recog.onerror = (event: any) => {
+        console.error('Speech recognition error:', event.error);
+        setIsListening(false);
+      };
+
+      setRecognition(recog);
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognition) return;
+
+    if (isListening) {
+      recognition.stop();
+      setIsListening(false);
+    } else {
+      recognition.start();
+      setIsListening(true);
+    }
+  };
+
   // Auto-focus description on mount
   useEffect(() => {
     if (aiEnabled && descriptionRef.current) {
       descriptionRef.current.focus();
     }
   }, [aiEnabled]);
+
+  // Handle Order Selection for Preview
+  useEffect(() => {
+    if (orderNumber) {
+      // Simulate fetching order/shipment info as soon as an order is selected
+      setOrderFetched(true);
+      if (!shipmentId) {
+        setShipmentId('SHIP-' + orderNumber.split('-')[1]);
+      }
+    } else {
+      setOrderFetched(false);
+      setShipmentId('');
+    }
+  }, [orderNumber]);
 
   const handleDescriptionNext = () => {
     if (description.length > 10) {
@@ -48,7 +120,7 @@ export default function CustomerCreateTicket() {
   };
 
   const handleOrderNumberSubmit = () => {
-    if (orderNumber.length >= 8) {
+    if (orderNumber) {
       setCurrentStep(3);
       setIsAnalyzing(true);
       
@@ -200,20 +272,42 @@ export default function CustomerCreateTicket() {
                     </div>
 
                     <div className="ml-14">
-                      <textarea
-                        ref={descriptionRef}
-                        value={description}
-                        onChange={(e) => setDescription(e.target.value)}
-                        onKeyDown={(e) => {
-                          if (e.key === 'Enter' && e.ctrlKey) {
-                            handleDescriptionNext();
-                          }
-                        }}
-                        placeholder="Example: I ordered a hydraulic pump (Part P-45892) with order ORD-45678901, but when it arrived, the pump was missing from the box..."
-                        rows={6}
-                        disabled={currentStep > 1}
-                        className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all resize-none disabled:bg-gray-50 disabled:text-gray-700"
-                      />
+                      <div className="relative">
+                        <textarea
+                          ref={descriptionRef}
+                          value={description}
+                          onChange={(e) => setDescription(e.target.value)}
+                          onKeyDown={(e) => {
+                            if (e.key === 'Enter' && e.ctrlKey) {
+                              handleDescriptionNext();
+                            }
+                          }}
+                          placeholder="Example: I ordered a hydraulic pump (Part P-45892) with order ORD-45678901, but when it arrived, the pump was missing from the box..."
+                          rows={6}
+                          disabled={currentStep > 1}
+                          className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all resize-none disabled:bg-gray-50 disabled:text-gray-700 pr-12"
+                        />
+                        {currentStep === 1 && recognition && (
+                          <button
+                            type="button"
+                            onClick={toggleListening}
+                            className={`absolute bottom-4 right-4 p-2.5 rounded-full transition-all flex items-center justify-center ${
+                              isListening 
+                                ? 'bg-[#C8102E] text-white animate-pulse shadow-lg scale-110' 
+                                : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                            }`}
+                            title={isListening ? 'Stop Listening' : 'Speak Description'}
+                          >
+                            {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                          </button>
+                        )}
+                        {isListening && (
+                          <div className="absolute top-3 right-4 flex items-center gap-2 px-2 py-1 bg-red-50 rounded-md border border-red-100 animate-pulse">
+                            <div className="w-1.5 h-1.5 rounded-full bg-[#C8102E]"></div>
+                            <span className="text-[10px] font-semibold text-[#C8102E] uppercase">Listening...</span>
+                          </div>
+                        )}
+                      </div>
                       <div className="flex items-center justify-between mt-2">
                         <p className="text-xs text-gray-500">
                           {currentStep === 1 ? 'Be as detailed as possible' : '✓ Description received'}
@@ -266,19 +360,17 @@ export default function CustomerCreateTicket() {
                       </div>
 
                       <div className="ml-14">
-                        <input
-                          type="text"
+                        <select
                           value={orderNumber}
                           onChange={(e) => setOrderNumber(e.target.value)}
-                          onKeyDown={(e) => {
-                            if (e.key === 'Enter') {
-                              handleOrderNumberSubmit();
-                            }
-                          }}
-                          placeholder="ORD-12345678"
                           disabled={currentStep > 2}
                           className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all disabled:bg-gray-50 disabled:text-gray-700 font-mono"
-                        />
+                        >
+                          <option value="">Select an order number...</option>
+                          {availableOrders.map((ord) => (
+                            <option key={ord} value={ord}>{ord}</option>
+                          ))}
+                        </select>
                         <div className="flex items-center justify-between mt-2">
                           <p className="text-xs text-gray-500">
                             {currentStep === 2 ? 'Format: ORD-XXXXXXXX' : '✓ Order details loaded'}
@@ -287,7 +379,7 @@ export default function CustomerCreateTicket() {
                             <button
                               type="button"
                               onClick={handleOrderNumberSubmit}
-                              disabled={orderNumber.length < 8}
+                              disabled={!orderNumber}
                               className="px-4 py-2 bg-[#C8102E] text-white rounded-lg text-sm font-medium hover:bg-[#A00D25] transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed flex items-center gap-2"
                             >
                               Continue
@@ -586,237 +678,309 @@ export default function CustomerCreateTicket() {
                 <>
                   {/* TRADITIONAL FORM */}
                   <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-                    <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
-                      <FileText className="w-5 h-5 text-[#C8102E]" />
-                      Ticket Information
-                    </h2>
+                        <h2 className="text-lg font-semibold text-gray-900 mb-6 flex items-center gap-2">
+                          <FileText className="w-5 h-5 text-[#C8102E]" />
+                          Ticket Information
+                        </h2>
 
-                    <div className="space-y-5">
-                      {/* Issue Title */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Issue Title <span className="text-[#C8102E]">*</span>
-                        </label>
-                        <input
-                          type="text"
-                          value={issueTitle}
-                          onChange={(e) => setIssueTitle(e.target.value)}
-                          placeholder="Brief summary of your issue"
-                          required
-                          className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
-                        />
-                      </div>
+                        <div className="space-y-5">
+                          {/* Issue Title */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Issue Title <span className="text-[#C8102E]">*</span>
+                            </label>
+                            <input
+                              type="text"
+                              value={issueTitle}
+                              onChange={(e) => setIssueTitle(e.target.value)}
+                              placeholder="Brief summary of your issue"
+                              required
+                              className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
+                            />
+                          </div>
 
-                      {/* Issue Description */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Issue Description <span className="text-[#C8102E]">*</span>
-                        </label>
-                        <textarea
-                          value={description}
-                          onChange={(e) => setDescription(e.target.value)}
-                          placeholder="Please describe your issue in detail..."
-                          rows={6}
-                          required
-                          className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all resize-none"
-                        />
-                        <p className="text-xs text-gray-500 mt-1">
-                          {description.length} / 2000 characters
-                        </p>
-                      </div>
-
-                      {/* Issue Type and Category */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Issue Type <span className="text-[#C8102E]">*</span>
-                          </label>
-                          <select
-                            value={issueType}
-                            onChange={(e) => setIssueType(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
-                          >
-                            <option value="">Select issue type...</option>
-                            <option value="part-missing">Part Missing</option>
-                            <option value="wrong-part">Wrong Part Delivered</option>
-                            <option value="damaged">Damaged Item</option>
-                            <option value="delay">Delivery Delay</option>
-                            <option value="quality">Quality Issue</option>
-                            <option value="warranty">Warranty Claim</option>
-                            <option value="technical">Technical Support</option>
-                            <option value="other">Other</option>
-                          </select>
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Issue Category <span className="text-[#C8102E]">*</span>
-                          </label>
-                          <select
-                            value={issueCategory}
-                            onChange={(e) => setIssueCategory(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
-                          >
-                            <option value="">Select category...</option>
-                            <option value="delivery">Delivery</option>
-                            <option value="product">Product Issue</option>
-                            <option value="billing">Billing</option>
-                            <option value="technical">Technical</option>
-                            <option value="returns">Returns & Refunds</option>
-                            <option value="documentation">Documentation</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {/* Order Number and Shipment ID */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Order Number <span className="text-[#C8102E]">*</span>
-                          </label>
-                          <input
-                            type="text"
-                            value={orderNumber}
-                            onChange={(e) => setOrderNumber(e.target.value)}
-                            placeholder="ORD-12345678"
-                            required
-                            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Shipment ID (Optional)
-                          </label>
-                          <input
-                            type="text"
-                            value={shipmentId}
-                            onChange={(e) => setShipmentId(e.target.value)}
-                            placeholder="SHIP-XXXXXXXXX"
-                            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
-                          />
-                        </div>
-                      </div>
-
-                      {/* Part Number and Priority */}
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Part Number (Optional)
-                          </label>
-                          <input
-                            type="text"
-                            value={partNumber}
-                            onChange={(e) => setPartNumber(e.target.value)}
-                            placeholder="P-987654"
-                            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-2">
-                            Priority <span className="text-[#C8102E]">*</span>
-                          </label>
-                          <select
-                            value={priority}
-                            onChange={(e) => setPriority(e.target.value)}
-                            required
-                            className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
-                          >
-                            <option value="">Select priority...</option>
-                            <option value="low">Low - Minor inconvenience</option>
-                            <option value="medium">Medium - Moderate impact</option>
-                            <option value="high">High - Significant impact</option>
-                            <option value="urgent">Urgent - Business critical</option>
-                          </select>
-                        </div>
-                      </div>
-
-                      {/* Attachments */}
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">
-                          Attachments
-                          <span className="text-xs text-gray-500 font-normal ml-2">
-                            (Optional - Images, PDFs, or documents)
-                          </span>
-                        </label>
-                        <div
-                          onClick={() => document.getElementById('file-upload-trad')?.click()}
-                          className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#C8102E] transition-colors cursor-pointer bg-gray-50 hover:bg-white"
-                        >
-                          <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
-                          <p className="text-sm text-gray-600 mb-1 font-medium">
-                            Click to upload or drag and drop
-                          </p>
-                          <p className="text-xs text-gray-500">
-                            PDF, JPG, PNG, DOC up to 10MB each (Max 5 files)
-                          </p>
-                          <input
-                            id="file-upload-trad"
-                            type="file"
-                            onChange={handleFileUpload}
-                            className="hidden"
-                            multiple
-                            accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
-                          />
-                        </div>
-
-                        {files.length > 0 && (
-                          <div className="mt-4 space-y-2">
-                            {files.map((file, index) => (
-                              <div
-                                key={index}
-                                className="flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg"
-                              >
-                                <div className="flex items-center gap-3">
-                                  <Paperclip className="w-4 h-4 text-gray-400" />
-                                  <div>
-                                    <p className="text-sm font-medium text-gray-700">{file.name}</p>
-                                    <p className="text-xs text-gray-500">
-                                      {(file.size / 1024).toFixed(1)} KB
-                                    </p>
-                                  </div>
-                                </div>
+                          {/* Issue Description */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Issue Description <span className="text-[#C8102E]">*</span>
+                            </label>
+                            <div className="relative">
+                              <textarea
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                placeholder="Please describe your issue in detail..."
+                                rows={6}
+                                required
+                                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all resize-none pr-12"
+                              />
+                              {recognition && (
                                 <button
                                   type="button"
-                                  onClick={() => removeFile(index)}
-                                  className="text-gray-400 hover:text-red-600 transition-colors"
+                                  onClick={toggleListening}
+                                  className={`absolute bottom-4 right-4 p-2.5 rounded-full transition-all flex items-center justify-center ${
+                                    isListening 
+                                      ? 'bg-[#C8102E] text-white animate-pulse shadow-lg scale-110' 
+                                      : 'bg-gray-100 text-gray-500 hover:bg-gray-200'
+                                  }`}
+                                  title={isListening ? 'Stop Listening' : 'Speak Description'}
                                 >
-                                  <X className="w-5 h-5" />
+                                  {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
                                 </button>
-                              </div>
-                            ))}
+                              )}
+                            </div>
+                            <p className="text-xs text-gray-500 mt-1">
+                              {description.length} / 2000 characters
+                            </p>
                           </div>
-                        )}
-                      </div>
-                    </div>
-                  </div>
 
-                  {/* Action Buttons for Traditional Form */}
-                  <div className="flex gap-3">
-                    <button
-                      type="button"
-                      onClick={() => navigate('/customer/tickets')}
-                      className="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      className="flex-1 px-6 py-3 bg-[#C8102E] text-white rounded-lg font-medium hover:bg-[#A00D25] transition-colors shadow-sm flex items-center justify-center gap-2"
-                    >
-                      <Send className="w-5 h-5" />
-                      Submit Ticket
-                    </button>
-                  </div>
-                </>
+                          {/* Issue Type and Category */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Issue Type <span className="text-[#C8102E]">*</span>
+                              </label>
+                              <select
+                                value={issueType}
+                                onChange={(e) => setIssueType(e.target.value)}
+                                required
+                                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
+                              >
+                                <option value="">Select issue type...</option>
+                                <option value="part-missing">Part Missing</option>
+                                <option value="wrong-part">Wrong Part Delivered</option>
+                                <option value="damaged">Damaged Item</option>
+                                <option value="delay">Delivery Delay</option>
+                                <option value="quality">Quality Issue</option>
+                                <option value="warranty">Warranty Claim</option>
+                                <option value="technical">Technical Support</option>
+                                <option value="other">Other</option>
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Issue Category <span className="text-[#C8102E]">*</span>
+                              </label>
+                              <select
+                                value={issueCategory}
+                                onChange={(e) => setIssueCategory(e.target.value)}
+                                required
+                                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
+                              >
+                                <option value="">Select category...</option>
+                                <option value="delivery">Delivery</option>
+                                <option value="product">Product Issue</option>
+                                <option value="billing">Billing</option>
+                                <option value="technical">Technical</option>
+                                <option value="returns">Returns & Refunds</option>
+                                <option value="documentation">Documentation</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          {/* Order Number and Shipment ID */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Order Number <span className="text-[#C8102E]">*</span>
+                              </label>
+                              <select
+                                value={orderNumber}
+                                onChange={(e) => setOrderNumber(e.target.value)}
+                                required
+                                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all font-mono"
+                              >
+                                <option value="">Select an order number...</option>
+                                {availableOrders.map((ord) => (
+                                  <option key={ord} value={ord}>{ord}</option>
+                                ))}
+                              </select>
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Shipment ID (Optional)
+                              </label>
+                              <input
+                                type="text"
+                                value={shipmentId}
+                                onChange={(e) => setShipmentId(e.target.value)}
+                                placeholder="SHIP-XXXXXXXXX"
+                                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
+                              />
+                            </div>
+                          </div>
+
+                          {/* Part Number and Priority */}
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Part Number (Optional)
+                              </label>
+                              <input
+                                type="text"
+                                value={partNumber}
+                                onChange={(e) => setPartNumber(e.target.value)}
+                                placeholder="P-987654"
+                                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
+                              />
+                            </div>
+
+                            <div>
+                              <label className="block text-sm font-medium text-gray-700 mb-2">
+                                Priority <span className="text-[#C8102E]">*</span>
+                              </label>
+                              <select
+                                value={priority}
+                                onChange={(e) => setPriority(e.target.value)}
+                                required
+                                className="w-full px-4 py-3 bg-white border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
+                              >
+                                <option value="">Select priority...</option>
+                                <option value="low">Low - Minor inconvenience</option>
+                                <option value="medium">Medium - Moderate impact</option>
+                                <option value="high">High - Significant impact</option>
+                                <option value="urgent">Urgent - Business critical</option>
+                              </select>
+                            </div>
+                          </div>
+
+                          {/* Attachments */}
+                          <div>
+                            <label className="block text-sm font-medium text-gray-700 mb-2">
+                              Attachments
+                              <span className="text-xs text-gray-500 font-normal ml-2">
+                                (Optional - Images, PDFs, or documents)
+                              </span>
+                            </label>
+                            <div
+                              onClick={() => document.getElementById('file-upload-trad')?.click()}
+                              className="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#C8102E] transition-colors cursor-pointer bg-gray-50 hover:bg-white"
+                            >
+                              <Upload className="w-10 h-10 text-gray-400 mx-auto mb-3" />
+                              <p className="text-sm text-gray-600 mb-1 font-medium">
+                                Click to upload or drag and drop
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                PDF, JPG, PNG, DOC up to 10MB each (Max 5 files)
+                              </p>
+                              <input
+                                id="file-upload-trad"
+                                type="file"
+                                onChange={handleFileUpload}
+                                className="hidden"
+                                multiple
+                                accept=".pdf,.jpg,.jpeg,.png,.doc,.docx"
+                              />
+                            </div>
+
+                            {files.length > 0 && (
+                              <div className="mt-4 space-y-2">
+                                {files.map((file, index) => (
+                                  <div
+                                    key={index}
+                                    className="flex items-center justify-between px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg"
+                                  >
+                                    <div className="flex items-center gap-3">
+                                      <Paperclip className="w-4 h-4 text-gray-400" />
+                                      <div>
+                                        <p className="text-sm font-medium text-gray-700">{file.name}</p>
+                                        <p className="text-xs text-gray-500">
+                                          {(file.size / 1024).toFixed(1)} KB
+                                        </p>
+                                      </div>
+                                    </div>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeFile(index)}
+                                      className="text-gray-400 hover:text-red-600 transition-colors"
+                                    >
+                                      <X className="w-5 h-5" />
+                                    </button>
+                                  </div>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Action Buttons for Traditional Form */}
+                      <div className="flex gap-3">
+                        <button
+                          type="button"
+                          onClick={() => navigate('/customer/tickets')}
+                          className="px-6 py-3 bg-white border border-gray-300 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+                        >
+                          Cancel
+                        </button>
+                        <button
+                          type="submit"
+                          className="flex-1 px-6 py-3 bg-[#C8102E] text-white rounded-lg font-medium hover:bg-[#A00D25] transition-colors shadow-sm flex items-center justify-center gap-2"
+                        >
+                          <Send className="w-5 h-5" />
+                          Submit Ticket
+                        </button>
+                      </div>
+                    </>
               )}
             </div>
 
-            {/* RIGHT: Order Preview */}
-            <div className="lg:col-span-1">
+            {/* RIGHT SIDEBAR: PROACTIVE SUPPORT & PREVIEW */}
+            <div className="lg:col-span-1 space-y-6">
+              {/* 1. Recommended Articles (Deflection) */}
+              {description.length > 10 && (
+                <div className="bg-white rounded-2xl shadow-xl shadow-gray-200/50 border-2 border-red-50 p-6 animate-fade-in sticky top-8 z-10">
+                  <div className="flex items-center gap-2 mb-6">
+                    <div className="w-2 h-6 bg-[#C8102E] rounded-full"></div>
+                    <h3 className="font-bold text-gray-900 uppercase tracking-tight text-sm">Recommended Articles</h3>
+                  </div>
+                  <p className="text-xs text-gray-500 font-medium mb-6">
+                    Based on your description, these guides might resolve your issue faster:
+                  </p>
+                  <div className="space-y-3">
+                    {[
+                      { id: 1, title: 'Order Tracking Process', icon: Package, time: '4 min' },
+                      { id: 2, title: 'Track Shipment Using DHL', icon: Truck, time: '6 min' },
+                      { id: 3, title: 'Wrong Part Received', icon: AlertTriangle, time: '5 min' }
+                    ].map((article) => {
+                      const Icon = article.icon;
+                      return (
+                        <button
+                          key={article.id}
+                          type="button"
+                          onClick={() => navigate('/customer/knowledge-base')}
+                          className="w-full text-left p-4 bg-gray-50 border border-transparent rounded-xl hover:bg-white hover:border-[#C8102E] hover:shadow-lg transition-all group"
+                        >
+                          <div className="flex items-start gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-white border border-gray-100 flex items-center justify-center group-hover:bg-red-50 transition-colors">
+                              <Icon className="w-4 h-4 text-[#C8102E]" />
+                            </div>
+                            <div className="flex-1">
+                              <p className="text-xs font-bold text-gray-900 group-hover:text-[#C8102E] line-clamp-2">{article.title}</p>
+                              <div className="flex items-center gap-2 mt-1">
+                                <Clock className="w-3 h-3 text-gray-400" />
+                                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">{article.time} read</span>
+                              </div>
+                            </div>
+                          </div>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  <div className="mt-8 pt-6 border-t border-gray-100 text-center">
+                    <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-4">Or use AI Help</p>
+                    <button 
+                      type="button"
+                      className="w-full flex items-center justify-center gap-2 py-3 bg-gray-900 text-white rounded-xl text-xs font-bold hover:bg-black transition-all"
+                    >
+                      <Sparkles className="w-4 h-4 text-[#C8102E]" /> Ask AI Assistant
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* 2. Order Preview (Live Data) */}
               <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 sticky top-8">
                 {orderFetched ? (
                   <>
@@ -832,7 +996,7 @@ export default function CustomerCreateTicket() {
                             In Transit
                           </span>
                         </div>
-                        <p className="text-sm font-medium text-gray-900">ORD-45678901</p>
+                        <p className="text-sm font-medium text-gray-900 font-mono tracking-tight">{orderNumber}</p>
                       </div>
 
                       <div className="pb-4 border-b border-gray-200">

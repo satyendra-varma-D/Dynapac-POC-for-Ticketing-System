@@ -78,113 +78,93 @@ export default function SLAManagement() {
         </p>
       </div>
 
-      {/* SLA Cards */}
-      <div className="space-y-6">
-        {slaPolicies.map((policy) => (
-          <div
-            key={policy.id}
-            className="bg-white rounded-lg border border-gray-200 overflow-hidden"
-          >
-            {/* Card Header */}
-            <div className={`${policy.priorityBgColor} px-6 py-5 border-b border-gray-200`}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  {policy.icon}
-                  <div>
-                    <h2 className={`text-lg font-semibold ${policy.priorityColor}`}>
-                      {policy.priority} Priority
-                    </h2>
-                    <p className="text-sm text-gray-600 mt-0.5">{policy.description}</p>
-                  </div>
-                </div>
-                <div className={`px-4 py-2 rounded-lg bg-white border-2 ${policy.priorityBorderColor}`}>
-                  <div className="text-xs font-semibold text-gray-600 uppercase tracking-wide text-center mb-0.5">
-                    Priority Level
-                  </div>
-                  <div className={`text-xl font-bold ${policy.priorityColor} text-center`}>
-                    {policy.priority}
-                  </div>
-                </div>
-              </div>
-            </div>
+      {/* SLA Table */}
+      <div className="bg-white rounded-xl border border-gray-200 overflow-hidden shadow-sm">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-gray-50 border-b border-gray-200">
+                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Priority Level</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Policy Description</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Response Time</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Resolution Time</th>
+                <th className="px-6 py-4 text-xs font-semibold text-gray-600 uppercase tracking-wider">Escalation</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-gray-200">
+              {slaPolicies.map((policy) => (
+                <tr key={policy.id} className="hover:bg-gray-50 transition-colors group">
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-3">
+                      <div className={`p-2 rounded-lg ${policy.priorityBgColor}`}>
+                        {policy.icon}
+                      </div>
+                      <span className={`font-bold ${policy.priorityColor}`}>
+                        {policy.priority}
+                      </span>
+                    </div>
+                  </td>
+                  <td className="px-6 py-5">
+                    <p className="text-sm text-gray-600 max-w-xs">{policy.description}</p>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-4 h-4 text-blue-500" />
+                      <span className="text-sm font-semibold text-gray-900">{policy.responseTime}</span>
+                    </div>
+                    <span className="text-[10px] text-gray-400 block mt-0.5 whitespace-nowrap">Initial response</span>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-green-500" />
+                      <span className="text-sm font-semibold text-gray-900">{policy.resolutionTime}</span>
+                    </div>
+                    <span className="text-[10px] text-gray-400 block mt-0.5 whitespace-nowrap">Full resolution</span>
+                  </td>
+                  <td className="px-6 py-5">
+                    <div className="flex items-center gap-2">
+                      <AlertCircle className="w-4 h-4 text-purple-500" />
+                      <span className="text-sm font-semibold text-gray-900">{policy.escalationTime}</span>
+                    </div>
+                    <span className="text-[10px] text-gray-400 block mt-0.5 whitespace-nowrap">Auto-escalate</span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
 
-            {/* Card Body - SLA Metrics */}
-            <div className="p-6">
-              <div className="grid grid-cols-3 gap-4 mb-6">
-                {/* Response Time */}
-                <div className="bg-blue-50 rounded-lg p-4 border border-blue-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <Clock className="w-5 h-5 text-blue-600" />
-                    <h3 className="text-xs font-semibold text-blue-900 uppercase tracking-wide">
-                      Response Time
-                    </h3>
-                  </div>
-                  <div className="text-3xl font-bold text-blue-900 mb-1">
-                    {policy.responseTime}
-                  </div>
-                  <p className="text-xs text-blue-700">
-                    Initial acknowledgement to customer
-                  </p>
-                </div>
-
-                {/* Resolution Time */}
-                <div className="bg-green-50 rounded-lg p-4 border border-green-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <CheckCircle2 className="w-5 h-5 text-green-600" />
-                    <h3 className="text-xs font-semibold text-green-900 uppercase tracking-wide">
-                      Resolution Time
-                    </h3>
-                  </div>
-                  <div className="text-3xl font-bold text-green-900 mb-1">
-                    {policy.resolutionTime}
-                  </div>
-                  <p className="text-xs text-green-700">
-                    Complete issue resolution deadline
-                  </p>
-                </div>
-
-                {/* Escalation Time */}
-                <div className="bg-purple-50 rounded-lg p-4 border border-purple-200">
-                  <div className="flex items-center gap-2 mb-3">
-                    <AlertCircle className="w-5 h-5 text-purple-600" />
-                    <h3 className="text-xs font-semibold text-purple-900 uppercase tracking-wide">
-                      Escalation Time
-                    </h3>
-                  </div>
-                  <div className="text-3xl font-bold text-purple-900 mb-1">
-                    {policy.escalationTime}
-                  </div>
-                  <p className="text-xs text-purple-700">
-                    Auto-escalate if unresolved
-                  </p>
-                </div>
-              </div>
-
-              {/* SLA Coverage Details */}
-              <div className="pt-4 border-t border-gray-200">
-                <h4 className="text-sm font-semibold text-gray-700 mb-3">SLA Coverage Details:</h4>
-                <ul className="space-y-2">
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
-                    <span className="text-[#C8102E] font-bold mt-0.5">•</span>
-                    <span>Tickets are automatically assigned to agents based on priority</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
-                    <span className="text-[#C8102E] font-bold mt-0.5">•</span>
-                    <span>SLA timer starts when ticket is created</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
-                    <span className="text-[#C8102E] font-bold mt-0.5">•</span>
-                    <span>Escalations are sent to senior support managers</span>
-                  </li>
-                  <li className="flex items-start gap-2 text-sm text-gray-600">
-                    <span className="text-[#C8102E] font-bold mt-0.5">•</span>
-                    <span>All times calculated during business hours (8 AM - 8 PM, Mon-Fri)</span>
-                  </li>
-                </ul>
-              </div>
-            </div>
+      {/* SLA Coverage Details Footer */}
+      <div className="mt-8 bg-[#F8FAFC] rounded-xl border border-blue-100 p-6">
+        <div className="flex items-center gap-3 mb-6">
+          <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+            <CheckCircle2 className="w-6 h-6 text-white" />
           </div>
-        ))}
+          <div>
+            <h4 className="text-base font-semibold text-gray-900">SLA Coverage Rules</h4>
+            <p className="text-xs text-gray-500 italic">Governing terms for automated support escalation</p>
+          </div>
+        </div>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#C8102E] flex-shrink-0" />
+            <p className="text-xs text-gray-600 leading-relaxed">Tickets automatically assigned to agents based on priority levels</p>
+          </div>
+          <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#C8102E] flex-shrink-0" />
+            <p className="text-xs text-gray-600 leading-relaxed">SLA timer starts immediately upon ticket creation</p>
+          </div>
+          <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#C8102E] flex-shrink-0" />
+            <p className="text-xs text-gray-600 leading-relaxed">Escalations are automatically routed to senior management</p>
+          </div>
+          <div className="flex items-start gap-3 p-4 bg-white rounded-lg border border-gray-100 shadow-sm">
+            <div className="mt-1 w-1.5 h-1.5 rounded-full bg-[#C8102E] flex-shrink-0" />
+            <p className="text-xs text-gray-600 leading-relaxed">Calculation limited to business hours (8 AM - 8 PM, Mon-Fri)</p>
+          </div>
+        </div>
       </div>
     </div>
   );

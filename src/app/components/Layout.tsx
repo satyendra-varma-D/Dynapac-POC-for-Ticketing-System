@@ -53,6 +53,7 @@ export default function Layout() {
     if (path === '/dashboard' && (location.pathname === '/dashboard' || location.pathname.startsWith('/dashboard/ticket/'))) return true;
     if (path === '/my-tickets' && location.pathname === '/my-tickets') return true;
     if (path === '/sla' && location.pathname === '/sla') return true;
+    if (path === '/knowledge-base' && location.pathname === '/knowledge-base') return true;
     return location.pathname === path || location.pathname.startsWith(path + '/');
   };
 
@@ -134,14 +135,18 @@ export default function Layout() {
 
           {/* Knowledge Base */}
           <button
-            onClick={() => {}}
-            className="w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors"
+            onClick={() => navigate('/knowledge-base')}
+            className={`w-full flex items-center justify-between px-4 py-2.5 text-sm font-medium transition-colors ${
+              isActive('/knowledge-base')
+                ? 'text-[#C8102E] bg-red-50'
+                : 'text-gray-700 hover:bg-gray-50'
+            }`}
           >
             <div className="flex items-center gap-3">
               <BookOpen className="w-5 h-5" />
               <span>Knowledge Base</span>
             </div>
-            <ChevronRight className="w-4 h-4" />
+            <ChevronRight className={`w-4 h-4 transition-transform ${isActive('/knowledge-base') ? 'rotate-90' : ''}`} />
           </button>
 
           {/* SLA */}

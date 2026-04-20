@@ -1,7 +1,8 @@
 import { Outlet } from 'react-router';
-import { Search, Bell, LogOut, Home, Ticket, Package, BookOpen, DollarSign, Shield, BarChart3, MessageSquare, Headphones, Settings, ChevronDown, ChevronRight, Menu, Plus, Clock, User } from 'lucide-react';
+import { Search, LogOut, Home, Ticket, BookOpen, Settings, ChevronDown, ChevronRight, Menu, Plus, Clock, User, Bell, Package, MessageSquare, CheckCircle, AlertCircle, Sparkles } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router';
+import AIChatbot from './AIChatbot';
 
 interface MenuItem {
   label: string;
@@ -17,23 +18,63 @@ interface MenuGroup {
 
 export default function CustomerLayoutSidebar() {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
-  const [expandedGroups, setExpandedGroups] = useState<string[]>(['Tickets', 'Orders']);
+  const [expandedGroups, setExpandedGroups] = useState<string[]>(['Tickets']);
   const [showProfileMenu, setShowProfileMenu] = useState(false);
   const [showHeaderProfileMenu, setShowHeaderProfileMenu] = useState(false);
+  const [showNotifications, setShowNotifications] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Close header profile menu on outside click
+  // Close header menus on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       const target = e.target as HTMLElement;
       if (showHeaderProfileMenu && !target.closest('.header-profile-menu-container')) {
         setShowHeaderProfileMenu(false);
       }
+      if (showNotifications && !target.closest('.notifications-container')) {
+        setShowNotifications(false);
+      }
     };
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [showHeaderProfileMenu]);
+  }, [showHeaderProfileMenu, showNotifications]);
+
+  const recentNotifications = [
+    {
+      id: 1,
+      ticketId: 'TKT-10234',
+      title: 'Ticket Resolved',
+      message: 'Your ticket TKT-10234 has been marked as resolved.',
+      time: '10m ago',
+      type: 'status',
+      icon: CheckCircle,
+      color: 'text-green-600',
+      bg: 'bg-green-50'
+    },
+    {
+      id: 2,
+      ticketId: 'TKT-10198',
+      title: 'New Comment',
+      message: 'Sarah Johnson added a comment to your ticket TKT-10198.',
+      time: '1h ago',
+      type: 'comment',
+      icon: MessageSquare,
+      color: 'text-blue-600',
+      bg: 'bg-blue-50'
+    },
+    {
+      id: 4,
+      ticketId: 'TKT-10145',
+      title: 'Priority Updated',
+      message: 'Priority for TKT-10145 escalated to High Risk.',
+      time: '5h ago',
+      type: 'priority',
+      icon: AlertCircle,
+      color: 'text-red-600',
+      bg: 'bg-red-50'
+    }
+  ];
 
   const menuGroups: MenuGroup[] = [
     {
@@ -45,28 +86,10 @@ export default function CustomerLayoutSidebar() {
       ],
     },
     {
-      label: 'Orders',
-      icon: Package,
-      items: [
-        { label: 'My Orders', path: '/customer/orders', icon: Package },
-      ],
-    },
-    {
-      label: 'Financial',
-      icon: DollarSign,
-      items: [
-        { label: 'Invoices', path: '/customer/invoices', icon: DollarSign },
-        { label: 'Contracts & SLA', path: '/customer/contracts', icon: Shield },
-      ],
-    },
-    {
       label: 'Resources',
       icon: BookOpen,
       items: [
         { label: 'Knowledge Base', path: '/customer/knowledge-base', icon: BookOpen },
-        { label: 'Analytics', path: '/customer/analytics', icon: BarChart3 },
-        { label: 'Feedback', path: '/customer/feedback', icon: MessageSquare },
-        { label: 'Live Support', path: '/customer/support', icon: Headphones },
       ],
     },
   ];
@@ -84,23 +107,23 @@ export default function CustomerLayoutSidebar() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F6F8] flex">
+    <div className="min-h-screen bg-[#F5F6F8] flex relative">
       {/* Sidebar */}
       <aside
         className={`bg-white border-r border-gray-200 transition-all duration-300 flex flex-col ${
           sidebarCollapsed ? 'w-20' : 'w-64'
-        }`}
+        } z-20`}
       >
         {/* Logo Section */}
         <div className="h-16 border-b border-gray-200 flex items-center justify-between px-4">
           {!sidebarCollapsed && (
             <div className="flex items-center gap-3">
               <div className="w-9 h-9 bg-[#C8102E] rounded-lg flex items-center justify-center">
-                <span className="text-white font-bold text-base">A</span>
+                <span className="text-white font-bold text-base">D</span>
               </div>
               <div>
-                <div className="text-sm font-semibold text-gray-900">Aftermarket</div>
-                <div className="text-xs text-gray-500">Customer Portal</div>
+                <div className="text-sm font-semibold text-gray-900">Dynapac</div>
+                <div className="text-xs text-gray-500">Aftermarket Portal</div>
               </div>
             </div>
           )}
@@ -114,7 +137,6 @@ export default function CustomerLayoutSidebar() {
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto py-4 px-3">
-          {/* Dashboard - Always visible */}
           <button
             onClick={() => navigate('/customer/dashboard')}
             className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mb-2 ${
@@ -127,7 +149,6 @@ export default function CustomerLayoutSidebar() {
             {!sidebarCollapsed && <span>Dashboard</span>}
           </button>
 
-          {/* Menu Groups */}
           {menuGroups.map((group) => {
             const GroupIcon = group.icon;
             const isExpanded = expandedGroups.includes(group.label);
@@ -153,11 +174,9 @@ export default function CustomerLayoutSidebar() {
                   )}
                 </button>
 
-                {/* Submenu Items */}
                 {isExpanded && !sidebarCollapsed && (
                   <div className="ml-6 mt-1 space-y-1">
                     {group.items.map((item) => {
-                      const ItemIcon = item.icon;
                       return (
                         <button
                           key={item.path}
@@ -168,7 +187,7 @@ export default function CustomerLayoutSidebar() {
                               : 'text-gray-600 hover:bg-gray-100'
                           }`}
                         >
-                          <div className="w-1.5 h-1.5 rounded-full bg-gray-400 flex-shrink-0"></div>
+                          <div className={`w-1.5 h-1.5 rounded-full ${isActive(item.path) ? 'bg-[#C8102E]' : 'bg-gray-400'} flex-shrink-0`}></div>
                           <span className="flex-1 text-left">{item.label}</span>
                         </button>
                       );
@@ -178,107 +197,109 @@ export default function CustomerLayoutSidebar() {
               </div>
             );
           })}
-
-          {/* Notifications - Always visible */}
-          <button
-            onClick={() => navigate('/customer/notifications')}
-            className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-colors mt-2 relative ${
-              isActive('/customer/notifications')
-                ? 'bg-red-50 text-[#C8102E]'
-                : 'text-gray-700 hover:bg-gray-100'
-            }`}
-          >
-            <Bell className="w-5 h-5 flex-shrink-0" />
-            {!sidebarCollapsed && <span>Notifications</span>}
-            <span className="absolute top-2 left-8 w-2 h-2 bg-[#C8102E] rounded-full"></span>
-          </button>
         </nav>
-
-        {/* User Profile - Bottom */}
-        <div className="border-t border-gray-200 p-3">
-          <div className="relative">
-            <button
-              onClick={() => setShowProfileMenu(!showProfileMenu)}
-              className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-lg hover:bg-gray-100 transition-colors ${
-                sidebarCollapsed ? 'justify-center' : ''
-              }`}
-            >
-              <div className="w-9 h-9 bg-[#C8102E] rounded-full flex items-center justify-center flex-shrink-0">
-                <span className="text-white font-semibold text-sm">JD</span>
-              </div>
-              {!sidebarCollapsed && (
-                <div className="flex-1 text-left">
-                  <div className="text-sm font-medium text-gray-900">John Doe</div>
-                  <div className="text-xs text-gray-500">Acme Corp</div>
-                </div>
-              )}
-            </button>
-
-            {showProfileMenu && (
-              <div className={`absolute ${sidebarCollapsed ? 'left-full ml-2' : 'bottom-full mb-2'} ${sidebarCollapsed ? 'bottom-0' : 'left-0 right-0'} bg-white rounded-lg shadow-lg border border-gray-200 py-2 z-50`}>
-                <button
-                  onClick={() => {
-                    setShowProfileMenu(false);
-                    navigate('/customer/settings');
-                  }}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 transition-colors whitespace-nowrap"
-                >
-                  <Settings className="w-4 h-4" />
-                  Settings
-                </button>
-                <button
-                  onClick={() => navigate('/')}
-                  className="w-full flex items-center gap-2 px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors whitespace-nowrap"
-                >
-                  <LogOut className="w-4 h-4" />
-                  Logout
-                </button>
-              </div>
-            )}
-          </div>
-        </div>
       </aside>
 
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col min-w-0">
-        {/* Top Header */}
-        <header className="bg-white border-b border-gray-200 h-16">
+        <header className="bg-white border-b border-gray-200 h-16 z-10">
           <div className="h-full px-8 flex items-center justify-between">
-            {/* Search */}
             <div className="flex-1 max-w-xl">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
                 <input
                   type="text"
-                  placeholder="Search orders or tickets..."
+                  placeholder="Search tickets..."
                   className="w-full pl-10 pr-4 py-2 bg-[#F5F6F8] border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-[#C8102E] focus:border-transparent transition-all"
                 />
               </div>
             </div>
 
-            {/* Right Side Actions */}
-            <div className="flex items-center gap-3">
-              {/* Notifications */}
-              <button
-                onClick={() => navigate('/customer/notifications')}
-                className="relative p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-              >
-                <Bell className="w-5 h-5" />
-                <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#C8102E] rounded-full"></span>
-              </button>
+            <div className="flex items-center gap-4">
+              <div className="relative notifications-container">
+                <button 
+                  onClick={() => {
+                    setShowNotifications(!showNotifications);
+                    setShowHeaderProfileMenu(false);
+                  }}
+                  className={`relative p-2 rounded-lg transition-colors ${
+                    showNotifications ? 'bg-gray-100 text-[#C8102E]' : 'text-gray-600 hover:text-gray-900 hover:bg-gray-100'
+                  }`}
+                >
+                  <Bell className="w-5 h-5" />
+                  <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-[#C8102E] rounded-full ring-2 ring-white"></span>
+                </button>
 
-              {/* Profile Dropdown */}
+                {showNotifications && (
+                  <div className="absolute right-0 mt-3 w-[350px] bg-white rounded-xl shadow-2xl border border-gray-200 py-0 z-[100] overflow-hidden animate-fade-in">
+                    <div className="px-4 py-3 border-b border-gray-100 flex items-center justify-between bg-gray-50/50">
+                      <h3 className="text-base font-bold text-gray-900">Notifications</h3>
+                      <button className="text-xs font-semibold text-[#C8102E] hover:underline">Mark all as read</button>
+                    </div>
+                    
+                    <div className="max-h-[400px] overflow-y-auto no-scrollbar">
+                      {recentNotifications.map((notif) => {
+                        const Icon = notif.icon;
+                        return (
+                          <div 
+                            key={notif.id}
+                            className="px-4 py-3 border-b border-gray-100 last:border-0 hover:bg-gray-50 cursor-pointer transition-colors group"
+                          >
+                            <div className="flex items-start gap-3">
+                              <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${notif.bg}`}>
+                                <Icon className={`w-4 h-4 ${notif.color}`} />
+                              </div>
+                              <div className="flex-1 min-w-0">
+                                <div className="flex items-center justify-between mb-1">
+                                  <p className="text-sm font-bold text-gray-900 group-hover:text-[#C8102E] transition-colors">{notif.title}</p>
+                                  <span className="text-[11px] text-gray-400 font-medium">{notif.time}</span>
+                                </div>
+                                <p className="text-xs text-gray-600 leading-relaxed font-medium mb-1.5 line-clamp-2">{notif.message}</p>
+                                <button 
+                                  onClick={() => {
+                                    setShowNotifications(false);
+                                    navigate(`/customer/tickets/${notif.ticketId}`);
+                                  }}
+                                  className="text-[11px] font-bold text-[#C8102E] uppercase tracking-wider flex items-center gap-1 opacity-100 transition-opacity"
+                                >
+                                  View Details <ChevronRight className="w-3 h-3" />
+                                </button>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+
+                    <button
+                      onClick={() => {
+                        setShowNotifications(false);
+                        navigate('/customer/notifications');
+                      }}
+                      className="w-full py-2.5 bg-gray-50 text-sm font-bold text-gray-700 hover:text-[#C8102E] transition-colors border-t border-gray-100"
+                    >
+                      View All Notifications
+                    </button>
+                  </div>
+                )}
+              </div>
+
               <div className="relative header-profile-menu-container">
                 <button
-                  onClick={() => setShowHeaderProfileMenu(!showHeaderProfileMenu)}
-                  className="flex items-center gap-2 hover:bg-gray-100 rounded-lg px-2 py-1.5 transition-colors"
+                  onClick={() => {
+                    setShowHeaderProfileMenu(!showHeaderProfileMenu);
+                    setShowNotifications(false);
+                  }}
+                  className={`flex items-center gap-2 rounded-lg px-2 py-1.5 transition-colors ${
+                    showHeaderProfileMenu ? 'bg-gray-100' : 'hover:bg-gray-100'
+                  }`}
                 >
-                  <div className="w-9 h-9 bg-[#C8102E] rounded-full flex items-center justify-center flex-shrink-0">
-                    <span className="text-white font-semibold text-sm">JD</span>
+                  <div className="w-9 h-9 bg-gradient-to-br from-[#C8102E] to-[#A00D25] rounded-full flex items-center justify-center flex-shrink-0 ring-2 ring-white shadow-sm">
+                    <span className="text-white font-bold text-sm">JD</span>
                   </div>
                   <div className="text-left hidden sm:block">
-                    <div className="text-sm font-medium text-gray-900 leading-tight">John Doe</div>
-                    <div className="text-xs text-gray-500">Acme Corp</div>
+                    <div className="text-sm font-bold text-gray-900 leading-tight">John Doe</div>
+                    <div className="text-[10px] font-bold text-gray-500 uppercase tracking-wider">Acme Corp</div>
                   </div>
                 </button>
 
@@ -318,11 +339,13 @@ export default function CustomerLayoutSidebar() {
           </div>
         </header>
 
-        {/* Main Content */}
         <main className="flex-1 overflow-hidden">
           <Outlet />
         </main>
       </div>
+
+      {/* Global AI Chatbot */}
+      <AIChatbot />
     </div>
   );
 }

@@ -1,6 +1,11 @@
 import { useNavigate } from 'react-router';
-import { AlertTriangle, Clock, Package, CheckCircle, Ticket, TrendingUp, MessageCircle, X, HelpCircle, Send, Paperclip } from 'lucide-react';
+import { 
+  AlertTriangle, Clock, Package, CheckCircle, Ticket, TrendingUp, MessageCircle, 
+  MessageSquare, X, HelpCircle, Send, Paperclip, Plus, User, Sparkles, 
+  ChevronRight, BarChart3, Users, Filter, Calendar, Activity
+} from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Cell } from 'recharts';
 import { ImageWithFallback } from './figma/ImageWithFallback';
 import agentPhoto from 'figma:asset/fd383cc16a26e9b6919854dcabd4d7c098fb71ce.png';
 
@@ -15,6 +20,9 @@ interface Ticket {
   slaCountdown: string;
   slaRisk: boolean;
   lastUpdated: string;
+  source: 'ai' | 'admin' | 'customer';
+  createdDate: string;
+  createdBy: string;
 }
 
 const mockTickets: Ticket[] = [
@@ -29,6 +37,9 @@ const mockTickets: Ticket[] = [
     slaCountdown: '2h 15m',
     slaRisk: true,
     lastUpdated: '10 min ago',
+    source: 'ai',
+    createdDate: '2024-03-08',
+    createdBy: 'AI System',
   },
   {
     id: 'TKT-2448',
@@ -41,6 +52,9 @@ const mockTickets: Ticket[] = [
     slaCountdown: '5h 30m',
     slaRisk: false,
     lastUpdated: '45 min ago',
+    source: 'customer',
+    createdDate: '2024-03-07',
+    createdBy: 'Customer Portal',
   },
   {
     id: 'TKT-2445',
@@ -53,6 +67,9 @@ const mockTickets: Ticket[] = [
     slaCountdown: '1h 05m',
     slaRisk: true,
     lastUpdated: '1 hour ago',
+    source: 'admin',
+    createdDate: '2024-03-06',
+    createdBy: 'Mike Chen',
   },
   {
     id: 'TKT-2442',
@@ -65,6 +82,9 @@ const mockTickets: Ticket[] = [
     slaCountdown: '8h 20m',
     slaRisk: false,
     lastUpdated: '2 hours ago',
+    source: 'ai',
+    createdDate: '2024-03-05',
+    createdBy: 'AI System',
   },
   {
     id: 'TKT-2440',
@@ -77,7 +97,19 @@ const mockTickets: Ticket[] = [
     slaCountdown: 'Met',
     slaRisk: false,
     lastUpdated: '3 hours ago',
+    source: 'customer',
+    createdDate: '2024-03-04',
+    createdBy: 'Customer Portal',
   },
+];
+
+const trendingData = [
+  { month: 'Oct', raised: 120, resolved: 95 },
+  { month: 'Nov', raised: 145, resolved: 110 },
+  { month: 'Dec', raised: 130, resolved: 125 },
+  { month: 'Jan', raised: 165, resolved: 140 },
+  { month: 'Feb', raised: 180, resolved: 155 },
+  { month: 'Mar', raised: 210, resolved: 185 },
 ];
 
 export default function Dashboard() {
@@ -158,150 +190,222 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="max-w-[1600px] mx-auto px-6 py-8">
-      {/* Welcome Section */}
-      <div className="mb-8">
-        <h1 className="text-3xl font-semibold text-gray-900 mb-2">
-          Welcome back, Mike!
-        </h1>
-        <p className="text-gray-600">
-          Focus on priority tickets that need immediate attention
-        </p>
+    <div className="max-w-[1600px] mx-auto px-8 py-8 space-y-8 animate-fade-in bg-[#F9FAFB]">
+      {/* Professional Hero Section */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div>
+          <div className="flex items-center gap-2 mb-2">
+             <div className="px-2 py-0.5 bg-red-50 text-[#C8102E] text-[10px] font-bold uppercase tracking-wider rounded border border-red-100">Support Agent</div>
+             <div className="text-xs text-gray-400">Mike Chen • Germany Center</div>
+          </div>
+          <h1 className="text-3xl font-bold text-gray-900 tracking-tight">
+            Service Dashboard
+          </h1>
+        </div>
+        <div className="flex items-center gap-3">
+           <button className="flex items-center gap-2 px-5 py-2.5 bg-white border border-gray-200 rounded-xl font-bold text-xs text-gray-600 hover:bg-gray-50 transition-all shadow-sm">
+             <Calendar className="w-3.5 h-3.5" /> Export Data
+           </button>
+           <button 
+             onClick={() => navigate('/customer/create-ticket')}
+             className="flex items-center gap-2 px-6 py-2.5 bg-[#C8102E] rounded-xl font-bold text-xs text-white hover:bg-[#B00E29] transition-all shadow-lg shadow-red-900/10"
+           >
+             <Plus className="w-4 h-4" /> New Ticket
+           </button>
+        </div>
       </div>
 
-      {/* KPI Cards - Agent View */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">SLA At Risk</p>
-              <p className="text-3xl font-bold text-[#C8102E]">{slaAtRiskCount}</p>
-              <p className="text-xs text-[#C8102E] mt-2 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                Requires attention
-              </p>
+      {/* Analytics Convergence */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="bg-white rounded-[24px] p-7 border border-gray-100 shadow-sm relative overflow-hidden group">
+          <div className="relative z-10 flex flex-col justify-between">
+            <div className="w-12 h-12 bg-red-50 rounded-xl flex items-center justify-center mb-6 border border-red-100">
+              <AlertTriangle className="w-6 h-6 text-[#C8102E]" />
             </div>
-            <div className="w-14 h-14 bg-red-100 rounded-xl flex items-center justify-center">
-              <AlertTriangle className="w-7 h-7 text-[#C8102E]" />
+            <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-1">SLA At Risk</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-gray-900 leading-none">{slaAtRiskCount}</span>
+              <span className="text-sm font-medium text-[#C8102E]">Tickets</span>
             </div>
           </div>
         </div>
 
-        <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200 hover:shadow-md transition-shadow">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="text-sm text-gray-600 mb-1">Avg Response Time</p>
-              <p className="text-3xl font-bold text-gray-900">2.4h</p>
-              <p className="text-xs text-gray-500 mt-2 flex items-center gap-1">
-                <Clock className="w-3 h-3" />
-                Last 7 days
-              </p>
+        {/* Support Load Card */}
+        <div className="bg-white rounded-[24px] p-7 border border-gray-100 shadow-sm relative overflow-hidden group">
+          <div className="relative z-10">
+            <div className="w-12 h-12 bg-blue-50 rounded-xl flex items-center justify-center mb-6 border border-blue-100">
+              <Ticket className="w-6 h-6 text-blue-600" />
             </div>
-            <div className="w-14 h-14 bg-purple-100 rounded-xl flex items-center justify-center">
-              <Clock className="w-7 h-7 text-purple-600" />
+            <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-1">Open Tickets</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-gray-900 leading-none">{mockTickets.filter(t => t.status !== 'closed').length}</span>
+              <span className="text-sm font-medium text-gray-400">Active</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Speed Card */}
+        <div className="bg-white rounded-[24px] p-7 border border-gray-100 shadow-sm relative overflow-hidden group">
+          <div className="relative z-10">
+            <div className="w-12 h-12 bg-purple-50 rounded-xl flex items-center justify-center mb-6 border border-purple-100">
+              <Clock className="w-6 h-6 text-purple-600" />
+            </div>
+            <p className="text-[10px] font-bold text-gray-400 tracking-widest uppercase mb-1">Avg Response</p>
+            <div className="flex items-baseline gap-2">
+              <span className="text-4xl font-bold text-gray-900 leading-none">2.4h</span>
+              <span className="text-sm font-medium text-gray-400">Last 7d</span>
             </div>
           </div>
         </div>
       </div>
 
-      {/* Tickets Table */}
-      <div className="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-        <div className="px-6 py-4 border-b border-gray-200">
-          <h2 className="text-lg font-semibold text-gray-900">
+      {/* Analytical Trends & Distribution */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="lg:col-span-2 bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm">
+          <div className="flex items-center justify-between mb-10">
+            <div>
+              <h2 className="text-xl font-bold text-gray-900 tracking-tight">Ticketing Trends</h2>
+              <p className="text-xs text-gray-400 font-medium">Monthly performance: Raised vs Resolved</p>
+            </div>
+            <div className="flex items-center gap-4">
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-[#C8102E] rounded-full"></div>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Raised</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-3 h-3 bg-gray-400 rounded-full"></div>
+                <span className="text-[10px] font-bold text-gray-400 uppercase tracking-widest">Resolved</span>
+              </div>
+            </div>
+          </div>
+          
+          <div className="h-[280px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <BarChart data={trendingData} margin={{ top: 0, right: 0, left: -20, bottom: 0 }} barGap={8}>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#F1F5F9" />
+                <XAxis dataKey="month" axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 600 }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fill: '#94A3B8', fontSize: 11, fontWeight: 600 }} />
+                <Tooltip cursor={{ fill: '#F8FAFC' }} contentStyle={{ borderRadius: '12px', border: '1px solid #E2E8F0', boxShadow: '0 10px 15px -3px rgb(0 0 0 / 0.1)' }} />
+                <Bar dataKey="raised" fill="#C8102E" radius={[4, 4, 0, 0]} barSize={20} />
+                <Bar dataKey="resolved" fill="#94A3B8" radius={[4, 4, 0, 0]} barSize={20} />
+              </BarChart>
+            </ResponsiveContainer>
+          </div>
+        </div>
+
+        <div className="bg-white rounded-[24px] p-8 border border-gray-100 shadow-sm flex flex-col">
+          <div className="relative z-10 flex flex-col h-full">
+            <h2 className="text-xl font-bold mb-10 tracking-tight flex items-center gap-3">
+              <div className="p-2 bg-gray-50 rounded-lg"><Sparkles className="w-4 h-4 text-[#C8102E]" /></div>
+              Source Distribution
+            </h2>
+            
+            <div className="space-y-8 flex-1">
+              {[
+                { label: 'AI Extraction', count: 42, color: 'text-indigo-600', bg: 'bg-indigo-50' },
+                { label: 'Admin Created', count: 18, color: 'text-blue-600', bg: 'bg-blue-50' },
+                { label: 'Customer Portal', count: 40, color: 'text-gray-600', bg: 'bg-gray-100' },
+              ].map((src, i) => (
+                <div key={i}>
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-wider">{src.label}</span>
+                    <span className="text-sm font-bold text-gray-900">{src.count}%</span>
+                  </div>
+                  <div className="h-1.5 w-full bg-gray-50 rounded-full overflow-hidden">
+                    <div className={`h-full ${src.label === 'AI Extraction' ? 'bg-[#C8102E]' : 'bg-gray-300'} transition-all duration-1000`} style={{ width: `${src.count}%` }}></div>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            <button className="mt-10 w-full py-3 bg-gray-50 rounded-xl text-xs font-bold text-gray-600 hover:bg-gray-100 transition-all flex items-center justify-center gap-2">
+              View Insights <ChevronRight className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Unified Status Navigator */}
+      <div className="bg-white rounded-[16px] p-2 border border-gray-200 shadow-sm flex items-center gap-1 overflow-x-auto no-scrollbar">
+         {[
+           { label: 'New', count: 4, icon: Plus, iconColor: 'text-blue-600', bgColor: 'bg-blue-50' },
+           { label: 'Assigned', count: 12, icon: User, iconColor: 'text-amber-600', bgColor: 'bg-amber-50' },
+           { label: 'Waiting', count: 3, icon: Clock, iconColor: 'text-purple-600', bgColor: 'bg-purple-50' },
+           { label: 'Resolved', count: 45, icon: CheckCircle, iconColor: 'text-emerald-600', bgColor: 'bg-emerald-50' },
+           { label: 'Closed', count: 156, icon: X, iconColor: 'text-gray-600', bgColor: 'bg-gray-100' }
+         ].map((status, i) => (
+           <div key={i} className="flex-1 min-w-[140px] px-6 py-4 rounded-xl hover:bg-gray-50 transition-all flex items-center gap-4 group cursor-pointer border border-transparent">
+             <div className={`w-10 h-10 ${status.bgColor} rounded-lg flex items-center justify-center ${status.iconColor} transition-transform`}>
+               <status.icon className="w-5 h-5" />
+             </div>
+             <div>
+               <p className="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-0.5">{status.label}</p>
+               <p className="text-lg font-bold text-gray-900 leading-none">{status.count}</p>
+             </div>
+           </div>
+         ))}
+      </div>
+      <div className="bg-white rounded-[24px] shadow-sm border border-gray-200 overflow-hidden">
+        <div className="px-8 py-6 border-b border-gray-100 flex items-center justify-between">
+          <h2 className="text-xl font-bold text-gray-900 flex items-center gap-3">
             Priority Tickets
+            <span className="px-2.5 py-0.5 bg-red-50 text-[#C8102E] text-[10px] font-bold rounded uppercase tracking-wider">Active Focus</span>
           </h2>
-          <p className="text-sm text-gray-600 mt-1">
-            Showing high priority and SLA at-risk tickets
-          </p>
+          <div className="flex items-center gap-3">
+             <div className="relative">
+                <Filter className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
+                <input type="text" placeholder="Search..." className="pl-9 pr-4 py-1.5 bg-gray-50 border border-transparent rounded-lg text-xs font-medium focus:bg-white focus:border-gray-200 focus:outline-none transition-all w-36" />
+             </div>
+             <button className="p-2 text-gray-400 hover:text-[#C8102E] bg-gray-50 rounded-lg transition-colors"><BarChart3 className="w-4 h-4" /></button>
+          </div>
         </div>
 
         <div className="overflow-x-auto">
           <table className="w-full">
-            <thead className="bg-gray-50 border-b border-gray-200">
+            <thead className="bg-gray-50/50 border-b border-gray-100">
               <tr>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Priority
-                </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Ticket ID
-                </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Dealer
-                </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Order<br />Number
-                </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Issue Type
-                </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Status
-                </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Supplier<br />ETA
-                </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  SLA<br />Countdown
-                </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Last<br />Updated
-                </th>
-                <th className="px-6 py-3.5 text-left text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                  Action
-                </th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Priority</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Identifier</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Dealer Entity</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">By Whom</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Created Date</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">Status</th>
+                <th className="px-8 py-4 text-left text-[10px] font-bold text-gray-400 uppercase tracking-widest">SLA Time</th>
+                <th className="px-8 py-4 text-right text-[10px] font-bold text-gray-400 uppercase tracking-widest">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-100">
-              {priorityTickets.map((ticket) => (
-                <tr
-                  key={ticket.id}
-                  className="hover:bg-gray-50 transition-colors"
-                >
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    {getPriorityIcon(ticket.priority)}
+            <tbody className="divide-y divide-gray-100">
+              {mockTickets.filter(t => t.priority === 'high' || t.slaRisk).map((ticket) => (
+                <tr key={ticket.id} className="hover:bg-gray-50/30 transition-colors group">
+                  <td className="px-8 py-5">
+                    {ticket.priority === 'high' ? (
+                      <div className="inline-flex items-center gap-1.5 px-2 py-0.5 bg-red-50 text-[#C8102E] text-[10px] font-bold uppercase rounded">
+                         <div className="w-1 h-1 bg-[#C8102E] rounded-full animate-pulse"></div> High
+                      </div>
+                    ) : (
+                      <div className="text-[10px] font-bold text-gray-400 uppercase">Medium</div>
+                    )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm font-semibold text-blue-600">
-                      {ticket.id}
+                  <td className="px-8 py-5 text-sm font-bold text-gray-900 tracking-tight">#{ticket.id}</td>
+                  <td className="px-8 py-5">
+                    <div className="text-sm font-bold text-gray-900">{ticket.dealer}</div>
+                    <div className="text-[11px] text-gray-500">{ticket.issueType}</div>
+                  </td>
+                  <td className="px-8 py-5 text-sm font-medium text-gray-900">{ticket.createdBy}</td>
+                  <td className="px-8 py-5 text-sm text-gray-500">{ticket.createdDate}</td>
+                  <td className="px-8 py-5 text-sm">
+                    <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border ${getStatusColor(ticket.status)}`}>
+                      {ticket.status.replace('-', ' ')}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{ticket.dealer}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-600">{ticket.orderNumber}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{ticket.issueType}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`inline-flex px-3 py-1 rounded-md text-xs font-medium ${getStatusColor(
-                        ticket.status
-                      )}`}
-                    >
-                      {getStatusLabel(ticket.status)}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-900">{ticket.supplierETA}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span
-                      className={`text-sm ${getSLAColor(ticket.slaCountdown, ticket.slaRisk)}`}
-                    >
+                  <td className="px-8 py-5 text-sm">
+                    <div className={`font-bold ${ticket.slaRisk ? 'text-[#C8102E]' : 'text-emerald-600'}`}>
                       {ticket.slaCountdown}
-                    </span>
+                    </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-500">{ticket.lastUpdated}</span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => navigate(`/dashboard/ticket/${ticket.id}`)}
-                      className="text-sm font-medium text-[#C8102E] hover:text-[#A00D25] transition-colors"
-                    >
-                      View
+                  <td className="px-8 py-5 text-right">
+                    <button className="px-4 py-2 bg-gray-900 border border-gray-900 text-white text-[10px] font-bold uppercase tracking-widest rounded-lg hover:bg-white hover:text-gray-900 transition-all">
+                      Open
                     </button>
                   </td>
                 </tr>
